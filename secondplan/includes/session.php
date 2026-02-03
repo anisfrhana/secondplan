@@ -35,12 +35,27 @@ function initSession() {
     }
 }
 
-/**
- * Check if user is logged in
- */
-function isLoggedIn() {
-    return isset($_SESSION['user_id']) && isset($_SESSION['role']);
+if (!function_exists('isLoggedIn')) {
+    function isLoggedIn(): bool {
+        startSession(); // make sure session started
+        return !empty($_SESSION['user_id']);
+    }
 }
+
+if (!function_exists('getUserId')) {
+    function getUserId(): ?int {
+        startSession();
+        return $_SESSION['user_id'] ?? null;
+    }
+}
+
+if (!function_exists('getUserRole')) {
+    function getUserRole(): ?string {
+        startSession();
+        return $_SESSION['user_role'] ?? null; // match auth_functions.php
+    }
+}
+
 
 /**
  * Get current user ID
