@@ -3,7 +3,20 @@
  * SECONDPLAN - Register Page
  */
 
-require_once __DIR__ . '/../config/bootstrap.php';
+require_once __DIR__ . '/../config/bootstrap.php'; // must be first
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// When handling POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verifyCSRF($_POST['csrf'] ?? '')) {
+        die('CSRF token failed');
+    }
+
+    // ... continue with registration logic
+}
 
 // Redirect if logged in
 if (isLoggedIn()) {
@@ -32,28 +45,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $check = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-        $check->execute([$email]);
+    // Check if email exists
+    $check = $pdo->prepare("SELECT user_id FROM users WHERE email = ?");
+    $check->execute([$email]);
 
-        if ($check->fetch()) {
-            $errors[] = 'Email already registered';
-        } else {
-            $stmt = $pdo->prepare("
-                INSERT INTO users (name, email, phone, password, role, status, created_at)
-                VALUES (?, ?, ?, ?, ?, 'active', NOW())
-            ");
-            $stmt->execute([
-                $name,
-                $email,
-                $phone,
-                password_hash($password, PASSWORD_DEFAULT),
-                $role
-            ]);
+    if ($check->fetch()) {
+        $errors[] = 'Email already registered';
+    } else {
+        // Insert user
+        $stmt = $pdo->prepare("
+            INSERT INTO users (name, email, phone, password_hash, status, created_at)
+            VALUES (?, ?, ?, ?, 'active', NOW())
+        ");
+        $stmt->execute([
+            $name,
+            $email,
+            $phone,
+            password_hash($password, PASSWORD_DEFAULT)
+        ]);
 
-            redirect('/auth/login.php?registered=1');
-        }
+        // Get last inserted user ID
+        $userId = $pdo->lastInsertId();
+
+        // Assign role
+        $roleStmt = $pdo->prepare("
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT ?, role_id FROM roles WHERE role_name = ?
+        ");
+        $roleStmt->execute([$userId, $role]);
+
+        redirect('/auth/login.php?registered=1');
     }
 }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -252,6 +277,9 @@ Already have an account? <a href="login.php">Log in</a>
 
 </div>
 </div>
+
+<input type="hidden" name="csrf" value="<?= generateCSRF() ?>">
+
 
 <script>
 function togglePassword(id){
