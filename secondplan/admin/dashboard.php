@@ -1,197 +1,72 @@
 <?php
-session_start();
-include("../config/db.php");
-header('Content-Type: application/json');
+require_once __DIR__ . '/../config/config.php';
+requireRole([ROLE_ADMIN]);
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
-    echo json_encode(['success'=>false, 'message'=>'Unauthorized']);
-    exit;
-}
-
-$data = [];
-
-// Fetch counts safely using prepared statements
-$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM events");
-mysqli_stmt_execute($stmt);
-mysqli_stmt_bind_result($stmt, $data['events']);
-mysqli_stmt_fetch($stmt);
-mysqli_stmt_close($stmt);
-
-$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM event_booking");
-mysqli_stmt_execute($stmt);
-mysqli_stmt_bind_result($stmt, $data['bookings']);
-mysqli_stmt_fetch($stmt);
-mysqli_stmt_close($stmt);
-
-$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM tasks");
-mysqli_stmt_execute($stmt);
-mysqli_stmt_bind_result($stmt, $data['tasks']);
-mysqli_stmt_fetch($stmt);
-mysqli_stmt_close($stmt);
-
-$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM event_expenses");
-mysqli_stmt_execute($stmt);
-mysqli_stmt_bind_result($stmt, $data['expenses']);
-mysqli_stmt_fetch($stmt);
-mysqli_stmt_close($stmt);
-
-echo json_encode(['success'=>true, 'data'=>$data]);
-
-exits;
+// Fetch stats
+$data = [
+    'events' => $pdo->query("SELECT COUNT(*) FROM events")->fetchColumn(),
+    'bookings' => $pdo->query("SELECT COUNT(*) FROM bookings")->fetchColumn(),
+    'tasks' => $pdo->query("SELECT COUNT(*) FROM tasks")->fetchColumn(),
+    'expenses' => $pdo->query("SELECT COUNT(*) FROM expenses")->fetchColumn()
+];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SecondPlan</title>
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - <?= APP_NAME ?></title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; background:#f5f5f5; }
+.sidebar { width:200px; background:#1e293b; height:100vh; float:left; color:#fff; padding:20px; }
+.main-content { margin-left:200px; padding:20px; }
+.stat-card { display:inline-block; width:200px; background:#3b82f6; color:#fff; padding:20px; margin:10px; border-radius:10px; text-align:center; }
+.stat-card h3 { margin-bottom:10px; }
+a { color:#3b82f6; text-decoration:none; }
+</style>
 </head>
 <body>
-    <div class="app">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <div class="brand-icon">⚡</div>
-                <h1>SecondPlan</h1>
-            </div>
-            <nav class="nav">
-                <a class="nav-item active" href="dashboard.html">
-                    <span>📊</span> <span>Dashboard</span>
-                </a>
-                <a class="nav-item" href="bookings.html">
-                    <span>📅</span> <span>Bookings</span>
-                </a>
-                <a class="nav-item" href="events.html">
-                    <span>🎤</span> <span>Events</span>
-                </a>
-                <a class="nav-item" href="tasks.html">
-                    <span>✓</span> <span>Tasks</span>
-                </a>
-                <a class="nav-item" href="expenses.html">
-                    <span>💰</span> <span>Expenses</span>
-                </a>
-                <a class="nav-item" href="merchandise.html">
-                    <span>📦</span> <span>Merchandise</span>
-                </a>
-            </nav>
-        </aside>
+<div class="sidebar">
+    <h2><?= APP_NAME ?></h2>
+    <p>Admin Panel</p>
+    <hr>
+    <a href="dashboard.php">📊 Dashboard</a><br>
+    <a href="bookings.php">📅 Bookings</a><br>
+    <a href="events.php">🎤 Events</a><br>
+    <a href="tasks.php">✓ Tasks</a><br>
+    <a href="expenses.php">💰 Expenses</a><br>
+    <a href="../auth/logout.php">🚪 Logout</a>
+</div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <header class="header">
-                <input type="text" placeholder="Search..." class="search-box" id="searchBox">
-                <div class="header-actions">
-                    <button class="notification-btn" onclick="toggleNotifications()">
-                        🔔
-                        <span class="notification-badge" id="notificationBadge"></span>
-                    </button>
-                    <div class="user-avatar" onclick="toggleUserMenu()">👤</div>
-                </div>
-            </header>
-
-            <!-- Notification Dropdown -->
-            <div class="notification-dropdown" id="notificationDropdown">
-                <div class="notification-header">
-                    <h4>Notifications</h4>
-                    <button onclick="markAllRead()">Mark all read</button>
-                </div>
-                <div id="notificationList"></div>
-            </div>
-
-            <!-- Content -->
-            <main class="content">
-                <!-- Stats Grid -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon green">💰</div>
-                        <div class="stat-info">
-                            <div class="stat-label">Total Revenue</div>
-                            <div class="stat-value" id="totalRevenue">RM 0</div>
-                            <div class="stat-change" id="revenueChange">↑ 0%</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon blue">📅</div>
-                        <div class="stat-info">
-                            <div class="stat-label">Active Bookings</div>
-                            <div class="stat-value" id="activeBookings">0</div>
-                            <div class="stat-change" id="bookingsChange">↑ 0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon purple">✓</div>
-                        <div class="stat-info">
-                            <div class="stat-label">Pending Tasks</div>
-                            <div class="stat-value" id="pendingTasks">0</div>
-                            <div class="stat-change" id="tasksChange">↓ 0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon orange">📈</div>
-                        <div class="stat-info">
-                            <div class="stat-label">Monthly Expenses</div>
-                            <div class="stat-value" id="monthlyExpenses">RM 0</div>
-                            <div class="stat-change" id="expensesChange">↑ 0%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="grid-2">
-                    <div class="section">
-                        <div class="section-header">
-                            <h3>Revenue Overview</h3>
-                            <select id="revenueFilter" onchange="loadRevenueChart()">
-                                <option value="7">Last 7 days</option>
-                                <option value="30">Last 30 days</option>
-                                <option value="90">Last 3 months</option>
-                            </select>
-                        </div>
-                        <div class="chart" id="revenueChart"></div>
-                    </div>
-
-                    <div class="section">
-                        <h3>Expense Breakdown</h3>
-                        <div id="expenseBreakdown"></div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="grid-2">
-                    <div class="section">
-                        <div class="section-header">
-                            <h3>Recent Bookings</h3>
-                            <a href="bookings.html" class="link-btn">View All</a>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Company</th>
-                                    <th>Event</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentBookings"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="section">
-                        <div class="section-header">
-                            <h3>Upcoming Events</h3>
-                            <a href="events.html" class="link-btn">View Calendar</a>
-                        </div>
-                        <div id="upcomingEvents"></div>
-                    </div>
-                </div>
-            </main>
+<div class="main-content">
+    <h1>Welcome, <?= e(getUserName()) ?></h1>
+    <p>Overview of your system</p>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Events</h3>
+            <p><?= $data['events'] ?></p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Bookings</h3>
+            <p><?= $data['bookings'] ?></p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Tasks</h3>
+            <p><?= $data['tasks'] ?></p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Expenses</h3>
+            <p><?= $data['expenses'] ?></p>
         </div>
     </div>
 
-    <script src="assets/js/dashboard.js"></script>
+    <h2>Quick Actions</h2>
+    <ul>
+        <li><a href="events.php">Manage Events</a></li>
+        <li><a href="bookings.php">View Bookings</a></li>
+        <li><a href="tasks.php">Manage Tasks</a></li>
+        <li><a href="expenses.php">Manage Expenses</a></li>
+    </ul>
+</div>
 </body>
 </html>
