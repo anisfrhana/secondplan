@@ -1,129 +1,264 @@
-﻿<?php
-$title = 'Register  SecondPlan';
+<?php
+/**
+ * SECONDPLAN - Register Page
+ */
+
 require_once __DIR__ . '/../config/bootstrap.php';
-verify_csrf();
 
-$isJson = (($_SERVER['HTTP_ACCEPT'] ?? '') && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $email = trim($_POST['email'] ?? '');
-  $name  = trim($_POST['name'] ?? '');
-  $pass  = $_POST['password'] ?? '';
-  $role  = $_POST['role'] ?? 'client';
-
-  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $error = 'Invalid email';
-  elseif (strlen($pass) < 6) $error = 'Password too short';
-  elseif (!$name) $error = 'Name required';
-  elseif (!in_array($role, ['client','customer','member'], true)) $error = 'Invalid role';
-
-  if (!empty($error)) {
-    if ($isJson) { http_response_code(400); header('Content-Type: application/json'); echo json_encode(['success'=>false,'message'=>$error]); exit; }
-  } else {
-    $q = $pdo->prepare("SELECT 1 FROM users WHERE email=?");
-    $q->execute([$email]);
-    if ($q->fetch()) {
-      if ($isJson) { http_response_code(409); header('Content-Type: application/json'); echo json_encode(['success'=>false,'message'=>'Email already registered']); exit; }
-      $error = 'Email already registered';
-    } else {
-      $hash = password_hash($pass, PASSWORD_DEFAULT);
-      $roleId = match ($role) {
-        'client'   => 2,
-        'customer' => 3,
-        'member'   => 4,
-        default    => 2
-      };
-      $pdo->beginTransaction();
-      try {
-        $stmt = $pdo->prepare("INSERT INTO users (email, password_hash, name, status) VALUES (?,?,?, 'active')");
-        $stmt->execute([$email, $hash, $name]);
-        $uid = (int)$pdo->lastInsertId();
-
-        $pdo->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (?,?)")->execute([$uid, $roleId]);
-
-        $pdo->commit();
-
-        if ($isJson) { header('Content-Type: application/json'); echo json_encode(['success'=>true,'message'=>'Registration successful. Please login.']); exit; }
-        header('Location: /auth/login.php?ok=1'); exit;
-      } catch (Throwable $t) {
-        $pdo->rollBack();
-        if ($isJson) { http_response_code(500); header('Content-Type: application/json'); echo json_encode(['success'=>false,'message'=>'Registration failed']); exit; }
-        $error = 'Registration failed';
-      }
-    }
-  }
+// Redirect if logged in
+if (isLoggedIn()) {
+    redirect('/index.php');
 }
 
-include __DIR__ . '/../includes/header.php';
-?>
-<h1>Register</h1>
-<?php if (!empty($error)): ?><p style="color:red"><?php echo e($error); ?></p><?php endif; ?>
-<form method="post">
-  <input type="hidden" name="csrf" value="<?php echo csrf_token(); ?>">
-  <label>Email<br><input name="email" type="email" required></label><br><br>
-  <label>Name<br><input name="name" required></label><br><br>
-  <label>Password<br><input name="password" type="password" minlength="6" required></label><br><br>
-  <label>Account Type<br>
-    <select name="role" required>
-      <option value="client">Client (Booking)</option>
-      <option value="customer">Customer (Merch)</option>
-      <option value="member">Band Member</option>
-    </select>
-  </label><br><br>
-  <button type="submit">Create Account</button>
-</form>
-<?php include __DIR__ . '/../includes/footer.php';
-?>
+$errors = [];
 
-<!doctype html>
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+
+    $name     = trim($_POST['name'] ?? '');
+    $email    = trim($_POST['email'] ?? '');
+    $phone    = trim($_POST['phone'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm  = $_POST['confirm_password'] ?? '';
+    $role     = $_POST['role'] ?? 'user';
+
+    if ($name === '') $errors[] = 'Name is required';
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Valid email is required';
+    if (strlen($password) < PASSWORD_MIN_LENGTH) $errors[] = 'Password must be at least ' . PASSWORD_MIN_LENGTH . ' characters';
+    if ($password !== $confirm) $errors[] = 'Passwords do not match';
+
+    if (!in_array($role, ['user', 'member'])) {
+        $errors[] = 'Invalid account type';
+    }
+
+    if (empty($errors)) {
+        $check = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $check->execute([$email]);
+
+        if ($check->fetch()) {
+            $errors[] = 'Email already registered';
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO users (name, email, phone, password, role, status, created_at)
+                VALUES (?, ?, ?, ?, ?, 'active', NOW())
+            ");
+            $stmt->execute([
+                $name,
+                $email,
+                $phone,
+                password_hash($password, PASSWORD_DEFAULT),
+                $role
+            ]);
+
+            redirect('/auth/login.php?registered=1');
+        }
+    }
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Register - SecondPlan</title>
-  <link rel="stylesheet" href="assets/css/auth.css">
+<meta charset="UTF-8">
+<title>Register - SecondPlan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --bg:#0f172a;
+    --panel:#1e293b;
+    --border:#334155;
+    --text:#e5e7eb;
+    --text-secondary:#94a3b8;
+    --accent:#3b82f6;
+    --accent-hover:#2563eb;
+    --error:#ef4444;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto;
+    background:linear-gradient(135deg,var(--bg),#1e293b);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text);
+    padding:20px;
+}
+
+.register-container{width:100%;max-width:420px}
+
+.register-card{
+    background:rgba(30,41,59,.8);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:40px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.brand-icon{
+    width:48px;height:48px;
+    background:linear-gradient(135deg,var(--accent),#8b5cf6);
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+}
+.brand h1{font-size:24px;font-weight:700}
+
+.subtitle{
+    color:var(--text-secondary);
+    margin-bottom:32px;
+    font-size:15px;
+}
+
+.alert{
+    padding:12px 16px;
+    border-radius:8px;
+    margin-bottom:20px;
+    font-size:14px;
+    background:rgba(239,68,68,.1);
+    border:1px solid rgba(239,68,68,.3);
+    color:#fca5a5;
+}
+
+.form-group{margin-bottom:20px}
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+    color:var(--text-secondary);
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:12px 16px;
+    background:rgba(15,23,42,.5);
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:var(--text);
+    font-size:15px;
+}
+
+.password-wrapper{position:relative}
+.toggle-password{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    background:none;
+    border:none;
+    color:var(--text-secondary);
+    cursor:pointer;
+    font-size:20px;
+}
+
+.btn-primary{
+    width:100%;
+    padding:14px;
+    background:linear-gradient(135deg,var(--accent),#2563eb);
+    border:none;
+    border-radius:8px;
+    color:white;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.register-link{
+    text-align:center;
+    margin-top:20px;
+    font-size:14px;
+    color:var(--text-secondary);
+}
+.register-link a{color:var(--accent);text-decoration:none}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="header">
-      <span class="dot"></span><h1>Create your account</h1>
-    </div>
-    <div class="sub">Register to access the admin dashboard</div>
+<div class="register-container">
+<div class="register-card">
 
-    <form id="register-form" class="form" autocomplete="off">
-      <!-- If you use CSRF on server, include hidden input "csrf" here -->
-      <div class="field">
-        <label for="name">Full Name</label>
-        <input id="name" name="name" class="input" placeholder="Your name" required>
-      </div>
+<div class="brand">
+    <div class="brand-icon">⚡</div>
+    <h1>SecondPlan</h1>
+</div>
 
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" class="input" type="email" placeholder="you@example.com" required>
-      </div>
+<p class="subtitle">Create your account to get started</p>
 
-      <div class="field password-wrap">
-        <label for="password">Password</label>
-        <input id="password" name="password" class="input" type="password" placeholder="At least 8 characters" required>
-        <button id="toggle-pass" class="toggle-pass">Show</button>
-      </div>
+<?php if ($errors): ?>
+<div class="alert">
+    <ul>
+        <?php foreach ($errors as $e): ?>
+            <li><?= e($e) ?></li>
+        <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>
 
-      <div class="field password-wrap">
-        <label for="confirm">Confirm Password</label>
-        <input id="confirm" class="input" type="password" placeholder="Re-enter password" required>
-        <button id="toggle-confirm" class="toggle-pass">Show</button>
-      </div>
+<form method="POST">
+<input type="hidden" name="csrf" value="<?= csrf_token() ?>">
 
-      <div class="row">
-        <span class="help">Already have an account? <a class="link" href="login.html">Sign in</a></span>
-      </div>
+<div class="form-group">
+<label>Full Name</label>
+<input type="text" name="name" required value="<?= e($_POST['name'] ?? '') ?>">
+</div>
 
-      <div id="notice" class="notice"></div>
+<div class="form-group">
+<label>Email</label>
+<input type="email" name="email" required value="<?= e($_POST['email'] ?? '') ?>">
+</div>
 
-      <div class="actions">
-        <button id="register-btn" class="btn success" type="submit">Create Account</button>
-      </div>
-    </form>
-  </div>
+<div class="form-group">
+<label>Phone</label>
+<input type="text" name="phone" value="<?= e($_POST['phone'] ?? '') ?>">
+</div>
 
-  <script src="assets/js/auth.js"></script>
+<div class="form-group">
+<label>Account Type</label>
+<select name="role">
+<option value="user">User (Booking & Merch)</option>
+<option value="member">Band Member</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Password</label>
+<div class="password-wrapper">
+<input type="password" id="password" name="password" required>
+<button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+</div>
+</div>
+
+<div class="form-group">
+<label>Confirm Password</label>
+<div class="password-wrapper">
+<input type="password" id="confirm_password" name="confirm_password" required>
+<button type="button" class="toggle-password" onclick="togglePassword('confirm_password')">👁️</button>
+</div>
+</div>
+
+<button class="btn-primary">Create Account</button>
+</form>
+
+<div class="register-link">
+Already have an account? <a href="login.php">Log in</a>
+</div>
+
+</div>
+</div>
+
+<script>
+function togglePassword(id){
+    const el=document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+}
+</script>
+
 </body>
 </html>
