@@ -1,10 +1,7 @@
 <?php
-/**
- * SECONDPLAN - Login Page
- * Handles user authentication with role-based access
- */
+require_once __DIR__ . '/../config/bootstrap.php'; // config + database + functions
+require_once __DIR__ . '/../includes/auth_functions.php'; // correct relative path
 
-require_once __DIR__ . '/../config/bootstrap.php';
 
 // Redirect if already logged in
 if (isLoggedIn()) {
@@ -12,38 +9,29 @@ if (isLoggedIn()) {
     switch ($role) {
         case 'admin':
             header('Location: ' . APP_URL . '/admin/dashboard.php');
-            break;
+            exit;
         case 'member':
             header('Location: ' . APP_URL . '/user/dashboard.php');
-            break;
+            exit;
         default:
             header('Location: ' . APP_URL . '/index.php');
+            exit;
     }
-    exit;
 }
 
 $error = '';
 $success = isset($_GET['registered']) ? 'Registration successful! Please login.' : '';
 
-// Check for JSON request
-$isJson = (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
-
+// Handle POST login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
-    
-    // Validate input
+
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required';
-        if ($isJson) {
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => $error]);
-            exit;
-        }
     } else {
         try {
-            // Query user with roles
+            // Fetch user with roles
             $stmt = $pdo->prepare("
                 SELECT u.*, GROUP_CONCAT(r.role_name) AS roles
                 FROM users u
@@ -53,76 +41,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 GROUP BY u.user_id
             ");
             $stmt->execute([$email]);
-            $user = $stmt->fetch();
-            
-            // Verify password
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
             if (!$user || !password_verify($password, $user['password_hash'])) {
                 $error = 'Invalid email or password';
-                if ($isJson) {
-                    http_response_code(401);
-                    header('Content-Type: application/json');
-                    echo json_encode(['success' => false, 'message' => $error]);
-                    exit;
-                }
             } else {
-                // Get primary role (first role in list)
+                // Set session
                 $roles = explode(',', $user['roles'] ?? '');
                 $primaryRole = $roles[0] ?? 'client';
-                
-                // Set session
+
                 setUserSession(
                     (int)$user['user_id'],
                     $user['name'],
                     $user['email'],
                     $primaryRole
                 );
-                
-                // Log activity
-                logActivity($user['user_id'], 'login', ['ip' => $_SERVER['REMOTE_ADDR']]);
-                
-                // Determine redirect URL based on role
-                $redirectUrl = $_SESSION['redirect_after_login'] ?? null;
-                unset($_SESSION['redirect_after_login']);
-                
-                if (!$redirectUrl) {
-                    switch ($primaryRole) {
-                        case 'admin':
-                            $redirectUrl = '/admin/dashboard.php';
-                            break;
-                        case 'member':
-                            $redirectUrl = '/user/dashboard.php';
-                            break;
-                        default:
-                            $redirectUrl = '/index.php';
-                    }
+
+                // Log login activity
+                logActivity($user['user_id'], 'login', ['ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown']);
+
+                // Redirect based on role
+                switch ($primaryRole) {
+                    case 'admin':
+                        header('Location: ' . APP_URL . '/admin/dashboard.php');
+                        exit;
+                    case 'member':
+                        header('Location: ' . APP_URL . '/user/dashboard.php');
+                        exit;
+                    default:
+                        header('Location: ' . APP_URL . '/index.php');
+                        exit;
                 }
-                
-                if ($isJson) {
-                    header('Content-Type: application/json');
-                    echo json_encode([
-                        'success' => true,
-                        'message' => 'Login successful',
-                        'role' => $primaryRole,
-                        'redirect' => $redirectUrl
-                    ]);
-                    exit;
-                }
-                
-                header('Location: ' . APP_URL . $redirectUrl);
-                exit;
             }
         } catch (PDOException $e) {
             error_log("Login error: " . $e->getMessage());
             $error = 'An error occurred. Please try again.';
-            if ($isJson) {
-                http_response_code(500);
-                header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => $error]);
-                exit;
-            }
         }
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
