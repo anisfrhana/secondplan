@@ -532,3 +532,13 @@ tbody tr:hover {
     display: block;
     margin-bottom: 16px;
 }
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+    color: #6b7280;
+    border-top: 1px solid rgba(51, 65, 85, 0.5);
+    margin-top: 40px;
+}
