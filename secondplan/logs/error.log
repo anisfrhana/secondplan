@@ -1,0 +1,202 @@
+[05-Feb-2026 00:34:42 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 00:34:48 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 10:32:45 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 10:32:54 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 10:36:28 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 10:36:33 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 10:47:45 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 11:11:15 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 11:38:09 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:21:47 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:21:54 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:22:00 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:22:05 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:22:51 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:23:50 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:23:52 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:24:17 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:24:25 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 12:36:28 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''20' OFFSET '0'' at line 11 in C:\laragon\www\secondplan\admin\bookings.php:45
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\bookings.php(45): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\bookings.php on line 45
+[05-Feb-2026 15:23:50 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens in Command line code:19
+Stack trace:
+#0 Command line code(19): PDOStatement->execute(Array)
+#1 {main}
+  thrown in Command line code on line 19
+[05-Feb-2026 15:24:10 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''50' OFFSET '0'' at line 1 in Command line code:5
+Stack trace:
+#0 Command line code(5): PDOStatement->execute(Array)
+#1 {main}
+  thrown in Command line code on line 5
+[05-Feb-2026 17:15:05 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 17:16:08 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 17:16:21 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 17:16:33 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 20:10:15 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 20:10:22 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 20:11:20 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in C:\laragon\www\secondplan\user\profile.php on line 98
+[05-Feb-2026 20:11:20 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in C:\laragon\www\secondplan\user\profile.php on line 102
+[05-Feb-2026 20:11:20 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in C:\laragon\www\secondplan\user\profile.php on line 110
+[05-Feb-2026 20:11:44 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 20:53:24 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 20:53:51 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 21:26:16 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in Command line code on line 11
+[05-Feb-2026 21:26:16 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in Command line code on line 11
+[05-Feb-2026 21:26:16 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in Command line code on line 12
+[05-Feb-2026 21:26:16 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in Command line code on line 13
+[05-Feb-2026 21:26:16 Asia/Kuala_Lumpur] PHP Deprecated:  password_verify(): Passing null to parameter #2 ($hash) of type string is deprecated in Command line code on line 13
+[05-Feb-2026 21:26:16 Asia/Kuala_Lumpur] PHP Warning:  Trying to access array offset on value of type bool in Command line code on line 17
+[05-Feb-2026 21:35:03 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`secondplan`.`activity_log`, CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL) in C:\laragon\www\secondplan\includes\auth_functions.php:24
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\auth_functions.php(24): PDOStatement->execute(Array)
+#1 C:\laragon\www\secondplan\auth\logout.php(12): logActivity(4, 'logout', Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\auth_functions.php on line 24
+[05-Feb-2026 23:04:27 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught TypeError: htmlspecialchars(): Argument #1 ($string) must be of type string, array given in C:\laragon\www\secondplan\includes\functions.php:8
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\functions.php(8): htmlspecialchars(Array, 3, 'UTF-8')
+#1 C:\laragon\www\secondplan\user\my_bookings.php(42): e(Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\functions.php on line 8
+[05-Feb-2026 23:20:45 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`secondplan`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`merch_id`) REFERENCES `merchandise` (`merch_id`) ON DELETE RESTRICT) in C:\laragon\www\secondplan\admin\merchandise.php:195
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\merchandise.php(195): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\merchandise.php on line 195
+[05-Feb-2026 23:20:52 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`secondplan`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`merch_id`) REFERENCES `merchandise` (`merch_id`) ON DELETE RESTRICT) in C:\laragon\www\secondplan\admin\merchandise.php:195
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\merchandise.php(195): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\merchandise.php on line 195
+[05-Feb-2026 23:20:56 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`secondplan`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`merch_id`) REFERENCES `merchandise` (`merch_id`) ON DELETE RESTRICT) in C:\laragon\www\secondplan\admin\merchandise.php:195
+Stack trace:
+#0 C:\laragon\www\secondplan\admin\merchandise.php(195): PDOStatement->execute(Array)
+#1 {main}
+  thrown in C:\laragon\www\secondplan\admin\merchandise.php on line 195
+[06-Feb-2026 00:30:11 Asia/Kuala_Lumpur] PHP Fatal error:  Uncaught TypeError: htmlspecialchars(): Argument #1 ($string) must be of type string, array given in C:\laragon\www\secondplan\includes\functions.php:8
+Stack trace:
+#0 C:\laragon\www\secondplan\includes\functions.php(8): htmlspecialchars(Array, 3, 'UTF-8')
+#1 C:\laragon\www\secondplan\user\my_bookings.php(98): e(Array)
+#2 {main}
+  thrown in C:\laragon\www\secondplan\includes\functions.php on line 8
+[06-Feb-2026 00:59:26 Asia/Kuala_Lumpur] PHP Warning:  Undefined array key "REQUEST_URI" in C:\laragon\www\secondplan\config\bootstrap.php on line 33
