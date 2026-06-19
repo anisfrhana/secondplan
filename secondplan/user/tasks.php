@@ -1,89 +1,123 @@
 <?php
-session_start();
-include("../config/db.php");
+require_once __DIR__ . '/../config/bootstrap.php';
+require_login();
 
-$uid = $_SESSION['id'];
+$userId = getUserId();
 
-$q=mysqli_query($conn,"SELECT * FROM tasks WHERE user_id='$uid'");
+$stmt = $pdo->prepare("
+    SELECT t.*, e.title as event_title
+    FROM tasks t
+    LEFT JOIN events e ON t.event_id = e.event_id
+    WHERE t.assigned_to = ?
+    ORDER BY FIELD(t.status, 'in_progress', 'todo', 'completed', 'cancelled'), t.due_date ASC
+");
+$stmt->execute([$userId]);
+$tasks = $stmt->fetchAll();
 
-echo "<h2>My Tasks</h2>";
-
-while($row=mysqli_fetch_assoc($q)){
- echo "
- <b>".$row['taskType']."</b><br>
- ".$row['description']."<br>
- ".$row['date_time']."<br><hr>
- ";
-}
+$totalTasks = count($tasks);
+$completedTasks = count(array_filter($tasks, fn($t) => $t['status'] === 'completed'));
+$inProgressTasks = count(array_filter($tasks, fn($t) => $t['status'] === 'in_progress'));
 ?>
-
-<?php
-session_start();
-require_once __DIR__ . '/../config/db.php';
-$uid = $_SESSION['user_id'] ?? $_SESSION['id'] ?? 0;
-
-if (isset($_GET['api']) && $_GET['api']==='my') {
-  header('Content-Type: application/json');
-  $rows = [];
-  $uid_safe = (int)$uid;
-  $q = mysqli_query($conn, "SELECT id AS task_id, taskType AS title, description, date_time AS due_date, status, priority FROM tasks WHERE user_id={$uid_safe}");
-  while($r=mysqli_fetch_assoc($q)){
-    $rows[] = [
-      'id' => (int)$r['task_id'],
-      'title' => $r['title'] ?: ($r['taskType'] ?? 'Task'),
-      'due_date' => $r['due_date'],
-      'priority' => $r['priority'] ?? '',
-      'status' => $r['status'] ?? 'pending',
-    ];
-  }
-  echo json_encode(['success'=>true,'data'=>$rows]); exit;
-}
-
-// (existing HTML output)
-echo "<h2>My Tasks</h2>";
-$q=mysqli_query($conn,"SELECT * FROM tasks WHERE user_id='{$uid}'");
-while($row=mysqli_fetch_assoc($q)){
-  echo "
-   <b>".$row['taskType']."</b><br>
-   ".$row['description']."<br>
-   ".$row['date_time']."<br><hr>
-  ";
-}
-
-?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>User · Tasks · SecondPlan</title>
-  <link rel="stylesheet" href="assets/css/user.css">
-  <script src="assets/js/user.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks - SecondPlan</title>
+    <link rel="stylesheet" href="assets/css/user.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
-<body data-page="tasks">
-  <nav class="topbar">
-    <span class="brand">SecondPlan</span>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="booking.html">Booking</a>
-    <a href="merchandise.html">Merchandise</a>
-    <a href="tasks.html">Tasks</a>
-    <span class="spacer"></span>
-    <a href="../auth/logout.php">Logout</a>
-  </nav>
+<body>
+<div class="app">
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
-  <div class="container">
-    <div class="page-head">
-      <div class="page-title">My Tasks</div>
-      <div class="toolbar">
-        <input id="search" class="search" placeholder="Search tasks…">
-        <button id="refresh" class="btn">Refresh</button>
-      </div>
-    </div>
+    <div class="main-content">
+        <header class="header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+            <div>
+                <h2>My Tasks</h2>
+                <div class="subtitle"><?= $totalTasks ?> total, <?= $completedTasks ?> completed</div>
+            </div>
+            <div class="header-actions">
+                <button class="notification-btn"></button>
+                <div class="user-avatar"><?= strtoupper(substr(getUserData()['name'] ?? 'U', 0, 1)) ?></div>
+            </div>
+        </header>
 
-    <div id="tasks-table"></div>
-  </div>
+        <main class="content">
+            <?php if ($inProgressTasks > 0 || ($totalTasks - $completedTasks) > 0): ?>
+            <div class="stats-grid" style="margin-bottom:20px;">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 6h4M6 9h2"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Tasks</div>
+                        <div class="stat-value"><?= $totalTasks ?></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">In Progress</div>
+                        <div class="stat-value"><?= $inProgressTasks ?></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value"><?= $completedTasks ?></div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
-  <div class="toast"></div>
+            <?php if (empty($tasks)): ?>
+                <div class="section">
+                    <div class="empty-state">
+                        <svg style="width:48px;height:48px;margin:0 auto 16px;display:block;opacity:0.3;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 6h4M6 9h2"/></svg>
+                        No tasks assigned to you.
+                    </div>
+                </div>
+            <?php else: ?>
+                <?php foreach ($tasks as $task): ?>
+                    <div class="task-card">
+                        <div class="task-header">
+                            <span class="task-title"><?= e($task['title']) ?></span>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <span class="badge status-<?= $task['status'] ?>"><?= ucfirst(str_replace('_', ' ', $task['status'])) ?></span>
+                                <span class="badge priority-<?= $task['priority'] ?>"><?= ucfirst($task['priority']) ?></span>
+                            </div>
+                        </div>
+                        <?php if ($task['description']): ?>
+                            <p class="task-description"><?= e($task['description']) ?></p>
+                        <?php endif; ?>
+                        <div class="task-meta">
+                            <?php if ($task['due_date']): ?>
+                                <span>
+                                    <svg style="width:12px;height:12px;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="12" height="11" rx="1"/><path d="M5 1v3M11 1v3M2 7h12"/></svg>
+                                    Due: <?= formatDate($task['due_date'], 'M d, Y') ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($task['event_title'])): ?>
+                                <span>
+                                    <svg style="width:12px;height:12px;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="6"/><path d="M8 5v3h3"/></svg>
+                                    Event: <?= e($task['event_title']) ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </main>
+    </div>
+</div>
+<script src="assets/js/common.js"></script>
+<script src="../assets/js/notifications.js"></script>
 </body>
 </html>
-
