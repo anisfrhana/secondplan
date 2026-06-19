@@ -1,162 +1,214 @@
 <?php
-$title = 'My Dashboard · SecondPlan';
 require_once __DIR__ . '/../config/bootstrap.php';
-require_login(); require_role(['member']);
-$userId = (int)$_SESSION['user_id'];
-include __DIR__ . '/../includes/header.php';
+require_login();
+
+$userId = getUserId();
+$userData = getUserData();
+
+$stmt = $pdo->prepare("
+    SELECT
+        (SELECT COUNT(*) FROM bookings WHERE user_id = ?) as total_bookings,
+        (SELECT COUNT(*) FROM bookings WHERE user_id = ? AND status = 'pending') as pending_bookings,
+        (SELECT COUNT(*) FROM orders WHERE user_id = ?) as total_orders,
+        (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE user_id = ?) as total_spent
+");
+$stmt->execute([$userId, $userId, $userId, $userId]);
+$stats = $stmt->fetch();
+
+$bookings = $pdo->prepare("
+    SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC LIMIT 5
+");
+$bookings->execute([$userId]);
+$recentBookings = $bookings->fetchAll();
+
+$latestBooking = !empty($recentBookings) ? $recentBookings[0] : null;
+
+$orders = $pdo->prepare("
+    SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 5
+");
+$orders->execute([$userId]);
+$recentOrders = $orders->fetchAll();
 ?>
-<h1>My Schedule &amp; Tasks</h1>
-
-<div style="display:grid; grid-template-columns:1.4fr 1fr; gap:16px;">
-  <section style="border:1px solid #ddd; border-radius:8px; padding:16px; background:#fff;">
-    <h3>Event Schedule</h3>
-    <div id="calendar"></div>
-    <p style="color:#666">Drag to reschedule (if allowed). Click to view.</p>
-  </section>
-
-  <section style="border:1px solid #ddd; border-radius:8px; padding:16px; background:#fff;">
-    <h3>My Tasks</h3>
-    <div id="tasks"></div>
-    <p style="color:#666">New assignments will pop up automatically.</p>
-  </section>
-</div>
-
-<div id="toast" style="position:fixed; right:16px; bottom:16px; background:#0a7; color:#fff; padding:10px 14px; border-radius:8px; display:none;"></div>
-
-<script>
-const USER_ID = <?php echo $userId; ?>;
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(()=> t.style.display='none', 2500);
-}
-
-async function loadTasks() {
-  try {
-    // FIXED: use /api/task.php (singular)
-    const res = await fetch(`/api/task.php?assigned_to=${USER_ID}`, { credentials:'same-origin' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const list = await res.json();
-
-    const el = document.getElementById('tasks');
-    el.innerHTML = '';
-    list.forEach(t => {
-      const d = document.createElement('div');
-      d.style.borderBottom = '1px solid #eee';
-      d.style.padding = '8px 4px';
-      const due = t.due_at ? new Date(t.due_at).toLocaleString() : '-';
-      d.innerHTML = `
-        <div><strong>${t.title}</strong></div>
-        <div style="color:#666">Due: ${due} · ${t.status ?? ''} · ${t.priority ?? ''}</div>`;
-      el.appendChild(d);
-    });
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-async function pollNotifications() {
-  try {
-    const r = await fetch('/api/notifications.php', { credentials:'same-origin' });
-    if (!r.ok) return;
-    const items = await r.json();
-    const unsent = items.filter(n => n.type === 'task_assignment' && Number(n.is_sent) === 0);
-    if (unsent.length) {
-      const n = unsent[0];
-      toast(n.title + ': ' + n.message);
-      if ('Notification' in window) {
-        if (Notification.permission === 'granted') {
-          new Notification(n.title, { body: n.message });
-        } else if (Notification.permission !== 'denied') {
-          Notification.requestPermission().then(p => {
-            if (p==='granted') new Notification(n.title, { body: n.message });
-          });
-        }
-      }
-      const f = new FormData(); f.append('mark_read','1');
-      await fetch('/api/notifications.php', { method:'POST', body:f, credentials:'same-origin' });
-      loadTasks();
-    }
-  } catch(e) { /* ignore polling errors */ }
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
-
-const cal = new FullCalendar.Calendar(calEl, {
-  initialView: 'dayGridMonth',
-  eventSources: [
-    { url: '/api/events.php' },          // events (your bookings or events table)
-    { url: '/api/tasks_calendar.php' }   // tasks as calendar items
-  ],
-  editable: true,
-  eventDrop: async (info) => {
-    try {
-      if (info.event.groupId === 'task') {
-        // (Optional) If you implemented /api/task.php/{id}/move:
-        const payload = { due_at: info.event.start.toISOString() };
-        const r = await fetch(`/api/task.php/${info.event.id}/move`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload),
-          credentials:'same-origin'
-        });
-        const data = await r.json();
-        if (!data.ok) info.revert(); else toast('Task rescheduled');
-      } else {
-        // Default: events move via /api/events.php/{id}/move
-        const payload = { start: info.event.start.toISOString(), end: info.event.end?.toISOString() };
-        const r = await fetch(`/api/events.php/${info.event.id}/move`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload),
-          credentials:'same-origin'
-        });
-        const data = await r.json();
-        if (!data.ok) info.revert(); else toast('Event rescheduled');
-      }
-    } catch (e) { info.revert(); }
-  }
-});
-
-  cal.render();
-
-  await loadTasks();
-  setInterval(pollNotifications, 15000);
-});
-</script>
-<?php include __DIR__ . '/../includes/footer.php'; ?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>User · Dashboard · SecondPlan</title>
-  <link rel="stylesheet" href="assets/css/user.css">
-  <script src="assets/js/user.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SecondPlan</title>
+    <link rel="stylesheet" href="assets/css/user.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
-<body data-page="dashboard">
-  <nav class="topbar">
-    <span class="brand">SecondPlan</span>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="booking.html">Booking</a>
-    <a href="merchandise.html">Merchandise</a>
-    <a href="tasks.html">Tasks</a>
-    <span class="spacer"></span>
-    <a href="../auth/logout.php">Logout</a>
-  </nav>
+<body>
+<div class="app">
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
-  <div class="container">
-    <div class="page-head"><div class="page-title">My Dashboard</div></div>
-    <section class="cards" id="cards"></section>
+    <div class="main-content">
+        <header class="header">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">&#9776;</button>
+            <div>
+                <h2>Welcome back, <?= e($userData['name']) ?></h2>
+                <div class="subtitle">Here's what's happening with your account</div>
+            </div>
+            <div class="header-actions">
+                <button class="notification-btn"></button>
+                <div class="user-avatar"><?= strtoupper(substr($userData['name'] ?? 'U', 0, 1)) ?></div>
+            </div>
+        </header>
 
-    <section style="margin-top:22px">
-      <p class="sub">Quick overview of your bookings, upcoming events and assigned tasks.</p>
-    </section>
-  </div>
+        <main class="content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="11" rx="1"/><path d="M5 1v3M11 1v3M2 7h12"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Bookings</div>
+                        <div class="stat-value"><?= $stats['total_bookings'] ?></div>
+                        <div class="stat-subtext">All time</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Pending Bookings</div>
+                        <div class="stat-value"><?= $stats['pending_bookings'] ?></div>
+                        <div class="stat-subtext">Awaiting approval</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1h2l1.5 8h8L14 4H4.5"/><circle cx="6" cy="13" r="1"/><circle cx="12" cy="13" r="1"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Orders</div>
+                        <div class="stat-value"><?= $stats['total_orders'] ?></div>
+                        <div class="stat-subtext">Merchandise orders</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1v5l3 2M2.5 8a5.5 5.5 0 1011 0 5.5 5.5 0 00-11 0z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Spent</div>
+                        <div class="stat-value">RM <?= number_format($stats['total_spent']) ?></div>
+                        <div class="stat-subtext">All time</div>
+                    </div>
+                </div>
+            </div>
 
-  <div class="toast"></div>
+            <?php if ($latestBooking): ?>
+            <div class="booking-timeline">
+                <?php
+                $bStatus = $latestBooking['status'];
+                $step1 = 'completed';
+                $step2 = in_array($bStatus, ['pending']) ? 'active' : (in_array($bStatus, ['approved', 'rejected']) ? 'completed' : '');
+                $step3class = '';
+                if ($bStatus === 'approved') $step3class = 'completed';
+                elseif ($bStatus === 'rejected') $step3class = 'active';
+                $line1 = in_array($bStatus, ['approved', 'rejected']) ? 'completed' : '';
+                $line2 = in_array($bStatus, ['approved', 'rejected']) ? 'completed' : '';
+                ?>
+                <div class="timeline-step <?= $step1 ?>">
+                    <div class="timeline-dot"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 10.5V2M4.5 5.5L8 2l3.5 3.5M2.5 13h11"/></svg></div>
+                    <div class="timeline-label">Submitted</div>
+                </div>
+                <div class="timeline-line <?= $line1 ?>"></div>
+                <div class="timeline-step <?= $step2 ?>">
+                    <div class="timeline-dot"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg></div>
+                    <div class="timeline-label">Under Review</div>
+                </div>
+                <div class="timeline-line <?= $line2 ?>"></div>
+                <div class="timeline-step <?= $step3class ?>">
+                    <div class="timeline-dot">
+                        <?php if ($bStatus === 'approved'): ?>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+                        <?php elseif ($bStatus === 'rejected'): ?>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+                        <?php else: ?>
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+                        <?php endif; ?>
+                    </div>
+                    <div class="timeline-label"><?= $bStatus === 'rejected' ? 'Rejected' : 'Approved' ?></div>
+                </div>
+            </div>
+            <div style="text-align:center;margin-bottom:24px;font-size:13px;color:var(--text-secondary);">
+                Latest booking: <strong><?= e($latestBooking['event_name']) ?></strong> &mdash;
+                <span class="badge status-<?= $latestBooking['status'] ?>"><?= ucfirst($latestBooking['status']) ?></span>
+            </div>
+            <?php endif; ?>
+
+            <div class="section">
+                <h3>Quick Actions</h3>
+                <ul class="quick-actions">
+                    <li><a href="booking.php">
+                        <i class="bi bi-plus-circle btn-icon"></i>
+                        New Booking
+                    </a></li>
+                    <li><a href="merchandise.php">
+                        <i class="bi bi-tag btn-icon"></i>
+                        Browse Merchandise
+                    </a></li>
+                    <li><a href="orders.php">
+                        <i class="bi bi-box-seam btn-icon"></i>
+                        My Orders
+                    </a></li>
+                </ul>
+            </div>
+
+            <div class="grid-2">
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Recent Bookings</h3>
+                        <a href="booking.php" class="link-btn">New Booking</a>
+                    </div>
+                    <?php if (empty($recentBookings)): ?>
+                        <div class="empty-state">No bookings yet. <a href="booking.php">Create one</a></div>
+                    <?php else: ?>
+                        <table>
+                            <thead><tr><th>Event</th><th>Date</th><th>Status</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($recentBookings as $b): ?>
+                                <tr>
+                                    <td><?= e($b['event_name']) ?></td>
+                                    <td><?= formatDate($b['event_date']) ?></td>
+                                    <td><span class="badge status-<?= $b['status'] ?>"><?= ucfirst($b['status']) ?></span></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Recent Orders</h3>
+                        <a href="merchandise.php" class="link-btn">Browse Shop</a>
+                    </div>
+                    <?php if (empty($recentOrders)): ?>
+                        <div class="empty-state">No orders yet. <a href="merchandise.php">Browse merchandise</a></div>
+                    <?php else: ?>
+                        <table>
+                            <thead><tr><th>Order</th><th>Amount</th><th>Status</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($recentOrders as $o): ?>
+                                <tr>
+                                    <td><?= e($o['order_number']) ?></td>
+                                    <td><?= formatMoney($o['total_amount']) ?></td>
+                                    <td><span class="badge status-<?= $o['status'] ?>"><?= ucfirst($o['status']) ?></span></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script src="assets/js/common.js"></script>
+<script src="../assets/js/notifications.js"></script>
 </body>
 </html>
